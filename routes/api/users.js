@@ -56,7 +56,9 @@ router.post(
       await user.save();
       //return jsonwebtoken allowing logged in right away after registered
       const payload = {
-        id: user.id,
+        user: {
+          id: user.id,
+        },
       };
       jwt.sign(
         payload,
