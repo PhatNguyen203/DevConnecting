@@ -1,0 +1,4 @@
+{
+  "mongoURI": "mongodb+srv://Lee0ne203:Thientrang18091993!@devconnecting.u91rb.mongodb.net/<dbname>?retryWrites=true&w=majority",
+  "jwtSecretToken": "webtoken"
+}
