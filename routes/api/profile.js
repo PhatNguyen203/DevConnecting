@@ -207,7 +207,7 @@ router.delete("/experience/:user_id", auth, async (req, res) => {
       .map((item) => item.id)
       .indexOf(req.params.user_id);
     console.log(removedIndex);
-    //remove exp by index
+    //remove exp by index using splice (remove index, how many el want to remove)
     profile.experience.splice(removedIndex, 1);
     await profile.save();
     return res.json(profile);
