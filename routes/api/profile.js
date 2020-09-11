@@ -153,7 +153,7 @@ router.put(
     [
       body("title", "title is required").not().isEmpty(),
       body("company", "company is required").not().isEmpty(),
-      body("from", "from date is required. Format :m-dd-yyyy").not().isEmpty(),
+      body("from", "from date is required. Format: mm-dd-yyyy").not().isEmpty(),
     ],
   ],
   async (req, res) => {
@@ -207,7 +207,7 @@ router.delete("/experience/:user_id", auth, async (req, res) => {
       .map((item) => item.id)
       .indexOf(req.params.user_id);
     console.log(removedIndex);
-    //remove exp by index using splice (remove index, how many el want to remove)
+    //remove exp by index using splice (remove index, how many elements want to remove)
     profile.experience.splice(removedIndex, 1);
     await profile.save();
     return res.json(profile);
@@ -216,4 +216,53 @@ router.delete("/experience/:user_id", auth, async (req, res) => {
     return res.status(500).json("Server Error");
   }
 });
+
+//@route    PUT api/profile/education
+//@desc     Update education profile
+//@access   private
+router.put(
+  "/education",
+  [
+    auth,
+    [
+      body("school", "School is required").not().isEmpty(),
+      body("degree", "your degree is required").not().isEmpty(),
+      body("fieldofstudy", "Field of Study is required").not().isEmpty(),
+      body("from", "From date is required. Format: mm-dd-yyyy").not().isEmpty(),
+    ],
+  ],
+  async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+    const {
+      school,
+      degree,
+      fieldofstudy,
+      from,
+      to,
+      current,
+      description,
+    } = req.body;
+    const educationFields = {
+      school,
+      degree,
+      fieldofstudy,
+      from,
+      to,
+      current,
+      description,
+    };
+    try {
+      const profile = await Profile.findOne({ user: req.user.id });
+      profile.education.push(educationFields);
+      await profile.save();
+      return res.json(profile);
+    } catch (error) {
+      console.log(error.message);
+      return res.status(500).json("Server Error");
+    }
+  }
+);
 module.exports = router;
