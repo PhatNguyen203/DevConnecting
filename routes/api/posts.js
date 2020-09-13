@@ -20,7 +20,6 @@ router.post(
       const user = await User.findById({ _id: req.user.id }).select(
         "-password"
       );
-      console.log(user);
       const newPost = new Post({
         text: req.body.text,
         user: req.user.id,
@@ -35,6 +34,7 @@ router.post(
     }
   }
 );
+
 //@route    GET api/posts
 //@desc     get all posts
 //@access   private
@@ -43,6 +43,25 @@ router.get("/", auth, async (req, res) => {
     const posts = await Post.find().sort({ date: -1 });
     return res.json(posts);
   } catch (error) {
+    console.log(error.message);
+    return res.status(500).json("Server Error");
+  }
+});
+
+//@route    GET api/posts/:user_id
+//@desc     get all posts by post Id
+//@access   private
+router.get("/:post_id", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.post_id);
+    if (!post) {
+      return res.status(404).json({ msg: "no post found" });
+    }
+    return res.json(post);
+  } catch (error) {
+    if (error.kind == "ObjectId") {
+      return res.status(400).json({ msg: "no user found" });
+    }
     console.log(error.message);
     return res.status(500).json("Server Error");
   }
