@@ -4,8 +4,8 @@ const config = require("config");
 const router = express.Router();
 const auth = require("../../middleware/auth");
 const { body, validationResult } = require("express-validator");
-const Profile = require("../models/Profile");
-const User = require("../models/User");
+const Profile = require("../../models/Profile");
+const User = require("../../models/User");
 const { response } = require("express");
 
 //@route    GET api/profile/me
