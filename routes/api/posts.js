@@ -60,18 +60,19 @@ router.get("/:post_id", auth, async (req, res) => {
     return res.json(post);
   } catch (error) {
     if (error.kind == "ObjectId") {
-      return res.status(400).json({ msg: "no user found" });
+      return res.status(400).json({ msg: "no post found" });
     }
     console.log(error.message);
     return res.status(500).json("Server Error");
   }
 });
+
 //@route    DELETE api/posts/:user_id
 //@desc     delete post by post id
 //@access   private
 router.delete("/:post_id", auth, async (req, res) => {
   try {
-    const post = await Post.findById(req.user.id);
+    const post = await Post.findById(req.params.post_id);
     if (post.user.id.toString() !== req.user.id) {
       return res.status(400).json({ msg: "user not authorized" });
     }
@@ -83,7 +84,62 @@ router.delete("/:post_id", auth, async (req, res) => {
     return res.send("post removed");
   } catch (error) {
     if (error.kind == "ObjectId") {
-      return res.status(400).json({ msg: "no user found" });
+      return res.status(400).json({ msg: "no post found" });
+    }
+    console.log(error.message);
+    return res.status(500).json("Server Error");
+  }
+});
+
+//@route    PUT api/posts/like/:post_id
+//@desc     like the post
+//@access   private
+router.put("/like/:post_id", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.post_id);
+    //check whether the post is liked
+    if (
+      post.likes.filter((like) => like.user.toString() === req.user.id).length >
+      0
+    ) {
+      return res.status(400).json({ msg: "post already liked" });
+    }
+    //likes the post
+    post.likes.push({ user: req.user.id });
+    await post.save();
+    return res.json(post.likes);
+  } catch (error) {
+    if (error.kind == "ObjectId") {
+      return res.status(400).json({ msg: "no post found" });
+    }
+    console.log(error.message);
+    return res.status(500).json("Server Error");
+  }
+});
+
+//@route    PUT api/posts/unlike/:post_id
+//@desc     like the post
+//@access   private
+router.put("/unlike/:post_id", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.params.post_id);
+    //check whether the post is liked
+    if (
+      post.likes.filter((like) => like.user.toString() === req.user.id)
+        .length === 0
+    ) {
+      return res.status(400).json({ msg: "post already liked" });
+    }
+    //remove the like
+    const removeIndex = await Post.likes
+      .map((like) => like.user.id.toString())
+      .indexOf(req.user.id);
+    post.likes.splice(removeIndex, 1);
+    await post.save();
+    return res.json(post.likes);
+  } catch (error) {
+    if (error.kind == "ObjectId") {
+      return res.status(400).json({ msg: "no post found" });
     }
     console.log(error.message);
     return res.status(500).json("Server Error");
