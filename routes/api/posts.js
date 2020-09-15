@@ -48,8 +48,8 @@ router.get("/", auth, async (req, res) => {
   }
 });
 
-//@route    GET api/posts/:user_id
-//@desc     get all posts by post Id
+//@route    GET api/posts/:post_id
+//@desc     get a post by post Id
 //@access   private
 router.get("/:post_id", auth, async (req, res) => {
   try {
@@ -58,6 +58,29 @@ router.get("/:post_id", auth, async (req, res) => {
       return res.status(404).json({ msg: "no post found" });
     }
     return res.json(post);
+  } catch (error) {
+    if (error.kind == "ObjectId") {
+      return res.status(400).json({ msg: "no user found" });
+    }
+    console.log(error.message);
+    return res.status(500).json("Server Error");
+  }
+});
+//@route    DELETE api/posts/:user_id
+//@desc     delete post by post id
+//@access   private
+router.delete("/:post_id", auth, async (req, res) => {
+  try {
+    const post = await Post.findById(req.user.id);
+    if (post.user.id.toString() !== req.user.id) {
+      return res.status(400).json({ msg: "user not authorized" });
+    }
+    if (!post) {
+      return res.status(404).json({ msg: "post not found" });
+    }
+    //remove post
+    await post.remove();
+    return res.send("post removed");
   } catch (error) {
     if (error.kind == "ObjectId") {
       return res.status(400).json({ msg: "no user found" });
