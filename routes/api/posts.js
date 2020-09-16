@@ -151,11 +151,11 @@ router.put("/unlike/:post_id", auth, async (req, res) => {
 //@access   private
 router.post(
   "/comment/:post_id",
-  [auth[body("text", "comment is required").not().isEmpty()]],
+  [auth, [body("text", "comment is required").not().isEmpty()]],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
-      res.status(400).json({ errors: errors.array() });
+      return res.status(400).json({ errors: errors.array() });
     }
     try {
       const user = await User.findById(req.user.id).select("-password");
@@ -168,8 +168,10 @@ router.post(
         avatar: user.avatar,
       };
       post.comments.push(newComment);
+
       await post.save();
-      return res.json(post);
+
+      res.json(post.comments);
     } catch (error) {
       if (error.kind == "ObjectId") {
         return res.status(400).json({ msg: "no post found" });
