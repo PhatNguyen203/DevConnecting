@@ -1,10 +1,13 @@
 import React, { Fragment } from "react";
+import Navigation from "./components/layout/Navigation";
+import Landing from "./components/layout/Landing";
 import "./App.css";
 
 const App = () => {
   return (
     <Fragment>
-      <h1>Hello</h1>
+      <Navigation />
+      <Landing />
     </Fragment>
   );
 };
