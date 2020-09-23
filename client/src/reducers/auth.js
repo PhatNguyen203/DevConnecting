@@ -8,7 +8,8 @@ const initialState = {
 };
 
 export default function (state = initialState, action) {
-  switch (action.type) {
+  const { payload, type } = action;
+  switch (type) {
     case REGISTER_SUCCESS:
       localStorage.setItem("token", action.token);
       return {
@@ -21,7 +22,6 @@ export default function (state = initialState, action) {
       localStorage.removeItem("token");
       return {
         ...state,
-        ...payload,
         token: null,
         isAuthenticated: false,
         loading: false,
